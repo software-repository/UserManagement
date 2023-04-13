@@ -1,8 +1,7 @@
 package com.jas.handler;
 
 import com.jas.dto.ApiErrorResponse;
-import com.jas.exceptions.DepartmentAlreadyExistsException;
-import com.jas.exceptions.DepartmentNotFoundException;
+import com.jas.exceptions.*;
 import org.springframework.context.support.DefaultMessageSourceResolvable;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -65,6 +64,33 @@ public class UserManagementExceptionHandler extends ResponseEntityExceptionHandl
         ApiErrorResponse errorResponse = getErrorResponse(HttpStatus.INTERNAL_SERVER_ERROR, ERROR_MESSAGE);
         return handleExceptionInternal(exception, errorResponse, new HttpHeaders(), HttpStatus.INTERNAL_SERVER_ERROR,
                 webRequest);
+    }
+
+    @ExceptionHandler(UserAlreadyExistsException.class)
+    public ResponseEntity<Object> handleUserAlreadyExistsException(UserAlreadyExistsException exception, WebRequest webRequest)
+    {
+        final String ERROR_MESSAGE = exception.getMessage();
+        logger.error(ERROR_MESSAGE, exception);
+        ApiErrorResponse errorResponse = getErrorResponse(HttpStatus.BAD_REQUEST, ERROR_MESSAGE);
+        return  handleExceptionInternal(exception, errorResponse, new HttpHeaders(), HttpStatus.BAD_REQUEST, webRequest);
+    }
+
+    @ExceptionHandler(UserNotFoundException.class)
+    public ResponseEntity<Object> handleUserNotFoundException(UserNotFoundException exception, WebRequest webRequest)
+    {
+        final String ERROR_MESSAGE = exception.getMessage();
+        logger.error(ERROR_MESSAGE, exception);
+        ApiErrorResponse errorResponse = getErrorResponse(HttpStatus.NOT_FOUND, ERROR_MESSAGE);
+        return  handleExceptionInternal(exception, errorResponse, new HttpHeaders(), HttpStatus.NOT_FOUND, webRequest);
+    }
+
+    @ExceptionHandler(BirthDateValidationException.class)
+    public ResponseEntity<Object> handleBirthDateValidation(BirthDateValidationException exception, WebRequest webRequest)
+    {
+        final String ERROR_MESSAGE = exception.getMessage();
+        logger.error(ERROR_MESSAGE, exception);
+        ApiErrorResponse errorResponse = getErrorResponse(HttpStatus.BAD_REQUEST, ERROR_MESSAGE);
+        return  handleExceptionInternal(exception, errorResponse, new HttpHeaders(), HttpStatus.BAD_REQUEST, webRequest);
     }
 
     private ApiErrorResponse getErrorResponse(HttpStatus status, String errorMessage) {
