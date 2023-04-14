@@ -2,7 +2,7 @@ package com.jas.controller;
 
 import com.jas.dto.UserDTO;
 import com.jas.entity.User;
-import com.jas.service.UserService;
+import com.jas.service.impl.UserServiceImpl;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -17,25 +17,24 @@ public class UserController {
 
 
     @Autowired
-    UserService userService;
+    UserServiceImpl userService;
 
-    @PostMapping("/create")
-    public ResponseEntity<User> createUser(@Valid @RequestBody User user) {
-         userService.createUser(user);
-        return ResponseEntity.status(HttpStatus.CREATED).body(user);
+    @PostMapping("")
+    public ResponseEntity<UserDTO> createUser(@Valid @RequestBody UserDTO user) {
+        return ResponseEntity.status(HttpStatus.CREATED).body(userService.createUser(user));
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<UserDTO> getUserById(@PathVariable Integer id) {
         UserDTO user = userService.getUserById(id);
-        return ResponseEntity.status(HttpStatus.CREATED).body(user);
+        return ResponseEntity.status(HttpStatus.OK).body(user);
     }
 
-    @GetMapping("/all")
+    @GetMapping()
     public ResponseEntity<List<UserDTO>> getAllUsers()
     {
         List<UserDTO> userDTOS = userService.getAllUsers();
-        return ResponseEntity.status(HttpStatus.CREATED).body(userDTOS);
+        return ResponseEntity.status(HttpStatus.OK).body(userDTOS);
     }
 
     @DeleteMapping("/{id}")
@@ -44,10 +43,10 @@ public class UserController {
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 
-    @PutMapping("/update")
-    public ResponseEntity<User> updateUserDetails(@Valid @RequestBody User user) {
+    @PutMapping()
+    public ResponseEntity updateUserDetails(@Valid @RequestBody UserDTO user) {
         userService.updateUser(user);
-        return ResponseEntity.status(HttpStatus.CREATED).body(user);
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 
 }

@@ -3,10 +3,8 @@ package com.jas.unittests.service;
 import com.jas.entity.Department;
 import com.jas.exceptions.DepartmentAlreadyExistsException;
 import com.jas.repository.DepartmentRepository;
-import com.jas.service.DepartmentService;
-import org.junit.Before;
+import com.jas.service.impl.DepartmentServiceImpl;
 import org.junit.Test;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -24,7 +22,7 @@ import java.util.stream.Stream;
 public class DepartmentServiceTests {
 
     @Autowired
-    private DepartmentService departmentService;
+    private DepartmentServiceImpl departmentService;
 
     @MockBean
     private DepartmentRepository repository;

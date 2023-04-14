@@ -1,50 +1,43 @@
 package com.jas.controller;
 
 
-import com.jas.entity.Department;
-import com.jas.service.DepartmentService;
+import com.jas.dto.DepartmentDTO;
+import com.jas.service.impl.DepartmentServiceImpl;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
-
 @RestController
 @RequestMapping(value = "api/v1/department")
 public class DepartmentController {
 
     @Autowired
-    DepartmentService departmentService;
+    DepartmentServiceImpl departmentService;
 
-    @PostMapping("/create")
-    public ResponseEntity<Department> createNewDepartment(@Valid @RequestBody Department department)
+    @PostMapping()
+    public ResponseEntity<DepartmentDTO> createNewDepartment(@Valid @RequestBody DepartmentDTO department)
     {
         departmentService.createDepartment(department);
         return ResponseEntity.status(HttpStatus.CREATED).body(department);
     }
 
-    @GetMapping("/all")
-    public ResponseEntity<List<Department>> getAllDepartments()
+    @GetMapping()
+    public ResponseEntity<List<DepartmentDTO>> getAllDepartments()
     {
-        List<Department> departmentList = new ArrayList<>();
-        departmentList = departmentService.getAllDepartments();
-        return ResponseEntity.status(HttpStatus.OK).body(departmentList);
+        return ResponseEntity.status(HttpStatus.OK).body(departmentService.getAllDepartments());
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Optional<Department>> getDepartmentById(@PathVariable Integer id)
+    public ResponseEntity<DepartmentDTO> getDepartmentById(@PathVariable Integer id)
     {
-        Optional<Department> department = departmentService.getDepartmentById(id);
-        return ResponseEntity.status(HttpStatus.OK).body(department);
+        return ResponseEntity.status(HttpStatus.OK).body(departmentService.getDepartmentById(id));
     }
 
-    @PatchMapping("/update")
-    public ResponseEntity updateDepartment(@Valid @RequestBody Department department) {
-        departmentService.updateDepartment(department);
-        return ResponseEntity.status(HttpStatus.NO_CONTENT).body(department);
+    @PatchMapping()
+    public ResponseEntity updateDepartment(@Valid @RequestBody DepartmentDTO department) {
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).body(departmentService.updateDepartment(department));
     }
 
     @DeleteMapping("/{id}")
