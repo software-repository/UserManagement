@@ -2,9 +2,6 @@ package com.jas.controller;
 
 import com.jas.dto.UserDTO;
 import com.jas.entity.User;
-import com.jas.exceptions.DepartmentNotFoundException;
-import com.jas.exceptions.UserAlreadyExistsException;
-import com.jas.exceptions.UserNotFoundException;
 import com.jas.service.UserService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,13 +20,13 @@ public class UserController {
     UserService userService;
 
     @PostMapping("/create")
-    public ResponseEntity<User> createUser(@Valid @RequestBody User user) throws UserAlreadyExistsException, DepartmentNotFoundException {
+    public ResponseEntity<User> createUser(@Valid @RequestBody User user) {
          userService.createUser(user);
         return ResponseEntity.status(HttpStatus.CREATED).body(user);
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<UserDTO> getUserById(@PathVariable Integer id) throws UserNotFoundException {
+    public ResponseEntity<UserDTO> getUserById(@PathVariable Integer id) {
         UserDTO user = userService.getUserById(id);
         return ResponseEntity.status(HttpStatus.CREATED).body(user);
     }
@@ -42,13 +39,13 @@ public class UserController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity deleteUser(Integer id) throws UserNotFoundException {
+    public ResponseEntity deleteUser(Integer id){
         userService.deleteUser(id);
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 
     @PutMapping("/update")
-    public ResponseEntity<User> updateUserDetails(@Valid @RequestBody User user) throws UserNotFoundException {
+    public ResponseEntity<User> updateUserDetails(@Valid @RequestBody User user) {
         userService.updateUser(user);
         return ResponseEntity.status(HttpStatus.CREATED).body(user);
     }

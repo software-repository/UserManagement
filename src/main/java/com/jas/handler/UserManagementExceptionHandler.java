@@ -46,17 +46,6 @@ public class UserManagementExceptionHandler extends ResponseEntityExceptionHandl
                 HttpStatus.BAD_REQUEST, webRequest);
     }
 
-    @ExceptionHandler(DepartmentNotFoundException.class)
-    public ResponseEntity<Object> handleDepartmentNotFoundException(DepartmentNotFoundException e, WebRequest webRequest)
-    {
-        final String ERROR_MESSAGE = e.getMessage();
-        logger.error(ERROR_MESSAGE, e);
-        ApiErrorResponse errorResponse = getErrorResponse(HttpStatus.NOT_FOUND, ERROR_MESSAGE);
-        return handleExceptionInternal(e, errorResponse, new HttpHeaders(), HttpStatus.NOT_FOUND, webRequest);
-    }
-
-
-
     @ExceptionHandler(Exception.class)
     public ResponseEntity<Object> handleAnyException(Exception exception, WebRequest webRequest) {
         final String ERROR_MESSAGE = "An unexpected error occurred";
@@ -75,8 +64,8 @@ public class UserManagementExceptionHandler extends ResponseEntityExceptionHandl
         return  handleExceptionInternal(exception, errorResponse, new HttpHeaders(), HttpStatus.BAD_REQUEST, webRequest);
     }
 
-    @ExceptionHandler(UserNotFoundException.class)
-    public ResponseEntity<Object> handleUserNotFoundException(UserNotFoundException exception, WebRequest webRequest)
+    @ExceptionHandler(ResourceNotFoundException.class)
+    public ResponseEntity<Object> handleUserNotFoundException(ResourceNotFoundException exception, WebRequest webRequest)
     {
         final String ERROR_MESSAGE = exception.getMessage();
         logger.error(ERROR_MESSAGE, exception);

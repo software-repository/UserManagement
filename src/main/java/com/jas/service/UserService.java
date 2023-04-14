@@ -4,9 +4,8 @@ package com.jas.service;
 import com.jas.dto.UserDTO;
 import com.jas.entity.Department;
 import com.jas.entity.User;
-import com.jas.exceptions.DepartmentNotFoundException;
+import com.jas.exceptions.ResourceNotFoundException;
 import com.jas.exceptions.UserAlreadyExistsException;
-import com.jas.exceptions.UserNotFoundException;
 import com.jas.repository.DepartmentRepository;
 import com.jas.repository.UserRepository;
 import org.springframework.beans.BeanUtils;
@@ -28,11 +27,11 @@ public class UserService {
     @Autowired
     DepartmentService departmentService;
 
-    public void createUser(User user) throws UserAlreadyExistsException, DepartmentNotFoundException {
+    public void createUser(User user){
         if(userAlreadyExists(user))
             throw new UserAlreadyExistsException("User already exists");
         if(departmentRepository.findById(user.getDepartmentId()).isEmpty())
-            throw new DepartmentNotFoundException("Department Id does not exist");
+            throw new ResourceNotFoundException("Department Id does not exist");
         userRepository.save(user);
     }
 
@@ -49,25 +48,25 @@ public class UserService {
         return userDTOS;
     }
 
-    public UserDTO getUserById(Integer id) throws UserNotFoundException {
+    public UserDTO getUserById(Integer id) {
         Optional<User> user = userRepository.findById(id);
         if(user.isEmpty())
-            throw new UserNotFoundException("User not found");
+            throw new ResourceNotFoundException("User not found");
         return getUserDTO(user.get());
     }
 
-    public void updateUser(User user) throws UserNotFoundException {
+    public void updateUser(User user) {
         User currentUser = userRepository.findById(user.getUserId()).get();
         if(currentUser==null)
-            throw new UserNotFoundException("User not found");
+            throw new ResourceNotFoundException("User not found");
         BeanUtils.copyProperties(user, currentUser);
         userRepository.save(currentUser);
     }
 
 
-    public void deleteUser(Integer id) throws UserNotFoundException {
+    public void deleteUser(Integer id) {
         if(userRepository.findById(id).isEmpty())
-            throw new UserNotFoundException("User not found");
+            throw new ResourceNotFoundException("User not found");
         userRepository.deleteById(id);
     }
 

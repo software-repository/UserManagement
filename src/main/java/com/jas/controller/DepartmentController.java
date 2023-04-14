@@ -2,7 +2,6 @@ package com.jas.controller;
 
 
 import com.jas.entity.Department;
-import com.jas.exceptions.DepartmentNotFoundException;
 import com.jas.service.DepartmentService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,7 +20,7 @@ public class DepartmentController {
     DepartmentService departmentService;
 
     @PostMapping("/create")
-    public ResponseEntity<Department> createNewDepartment(@Valid @RequestBody Department department) throws Exception
+    public ResponseEntity<Department> createNewDepartment(@Valid @RequestBody Department department)
     {
         departmentService.createDepartment(department);
         return ResponseEntity.status(HttpStatus.CREATED).body(department);
@@ -43,7 +42,7 @@ public class DepartmentController {
     }
 
     @PatchMapping("/update")
-    public ResponseEntity updateDepartment(@Valid @RequestBody Department department) throws DepartmentNotFoundException {
+    public ResponseEntity updateDepartment(@Valid @RequestBody Department department) {
         departmentService.updateDepartment(department);
         return ResponseEntity.status(HttpStatus.NO_CONTENT).body(department);
     }

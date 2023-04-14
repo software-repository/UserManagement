@@ -2,7 +2,6 @@ package com.jas.service;
 
 import com.jas.entity.Department;
 import com.jas.exceptions.DepartmentAlreadyExistsException;
-import com.jas.exceptions.DepartmentNotFoundException;
 import com.jas.repository.DepartmentRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,7 +17,7 @@ public class DepartmentService {
     @Autowired
     DepartmentRepository departmentRepository;
 
-    public void createDepartment(Department department) throws DepartmentAlreadyExistsException {
+    public void createDepartment(Department department) {
         if(!departmentRepository.findById(department.getDepartmentId()).isEmpty())
             throw new DepartmentAlreadyExistsException("Department already exists");
        departmentRepository.save(department);
@@ -34,7 +33,7 @@ public class DepartmentService {
         return departmentRepository.findById(id);
     }
 
-    public void updateDepartment(Department department) throws DepartmentNotFoundException {
+    public void updateDepartment(Department department) {
         Optional<Department> departmentId = departmentRepository.findById(department.getDepartmentId());
         if(departmentId.isEmpty())
             throw new DepartmentNotFoundException("Department not found");
