@@ -59,6 +59,8 @@ public class DepartmentServiceImpl implements DepartmentService {
 
     public void deleteDepartment(Integer id)
     {
+        if (departmentRepository.findById(id).isEmpty())
+            throw new ResourceNotFoundException("Department does not exist");
         departmentRepository.deleteById(id);
     }
 
