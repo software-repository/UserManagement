@@ -38,14 +38,14 @@ public class UserController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity deleteUser(Integer id){
+    public ResponseEntity deleteUser(@PathVariable Integer id){
         userService.deleteUser(id);
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 
-    @PutMapping()
-    public ResponseEntity updateUserDetails(@Valid @RequestBody UserDTO user) {
-        userService.updateUser(user);
+    @PutMapping("/{id}")
+    public ResponseEntity updateUserDetails(@Valid @RequestBody UserDTO user, @PathVariable Integer id) {
+        userService.updateUser(user,id);
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 

@@ -35,9 +35,9 @@ public class DepartmentController {
         return ResponseEntity.status(HttpStatus.OK).body(departmentService.getDepartmentById(id));
     }
 
-    @PatchMapping()
-    public ResponseEntity updateDepartment(@Valid @RequestBody DepartmentDTO department) {
-        return ResponseEntity.status(HttpStatus.NO_CONTENT).body(departmentService.updateDepartment(department));
+    @PatchMapping("/{id}")
+    public ResponseEntity updateDepartment(@Valid @RequestBody DepartmentDTO department, @PathVariable Integer id) {
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).body(departmentService.updateDepartment(department,id));
     }
 
     @DeleteMapping("/{id}")

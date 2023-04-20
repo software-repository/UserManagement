@@ -11,6 +11,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.io.Serializable;
 import java.util.Date;
 import java.util.Optional;
 
@@ -18,7 +19,7 @@ import java.util.Optional;
 @NoArgsConstructor
 @Data
 @Builder
-public class UserDTO {
+public class UserDTO implements Serializable {
 
     private Integer userId;
 

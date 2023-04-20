@@ -120,7 +120,7 @@ public class DepartmentServiceTest {
         departmentDTO = DepartmentDTO.builder()
                 .departmentId(1)
                 .departmentName("Test").build();
-        assertThrows(ResourceNotFoundException.class, ()->{departmentService.updateDepartment(departmentDTO);});
+        assertThrows(ResourceNotFoundException.class, ()->{departmentService.updateDepartment(departmentDTO,1);});
 
     }
 
@@ -131,7 +131,7 @@ public class DepartmentServiceTest {
         departmentDTO = DepartmentDTO.builder()
                 .departmentId(1)
                 .departmentName("Test").build();
-        departmentService.updateDepartment(departmentDTO);
+        departmentService.updateDepartment(departmentDTO,1);
         verify(departmentRepository, times(1)).setDepartmentNameById(departmentDTO.getDepartmentName(), departmentDTO.getDepartmentId());
     }
 

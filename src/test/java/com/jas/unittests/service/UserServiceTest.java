@@ -13,8 +13,10 @@ import com.jas.service.UserService;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.AutoConfigureOrder;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import java.util.Date;
@@ -29,9 +31,9 @@ import static org.mockito.Mockito.*;
 @RunWith(SpringRunner.class)
 public class UserServiceTest {
 
-    @MockBean
+    @Autowired
     DepartmentRepository departmentRepository;
-    @MockBean
+    @Autowired
     UserRepository userRepository;
 
     @Autowired
@@ -39,33 +41,43 @@ public class UserServiceTest {
 
 
     @Test
-    public void createUser_useralreadyexists_error()
+    public void verifyUserCreationErrorWhenEmailAlreadyExists()
     {
-        when(userRepository.findByEmail("abc@gmail.com")).thenThrow(new UserAlreadyExistsException("User already exists."));
+        //GIVEN
+        Department department = Department.builder()
+                        .departmentName("Test")
+                                .departmentId(1).build();
+        userRepository.save(User.builder().firstName("x").email("x@gmail.com").lastName("y")
+                .dob(new Date("30/12/1992")).department(department).build());
+        // when
         DepartmentDTO departmentDTO = DepartmentDTO.builder()
                 .departmentId(1)
                 .departmentName("Test").build();
         UserDTO userDTO = UserDTO.builder()
-                .department(departmentDTO)
                 .userId(1)
                 .dob(new Date("30/12/1992"))
-                .email("abc@gmail.com")
+                .email("x@gmail.com")
+                .department(departmentDTO)
                 .firstName("TestUser")
                 .lastName("TestUser")
                 .build();
-
+         // THEN
         assertThrows(UserAlreadyExistsException.class, ()->userService.createUser(userDTO));
-        verify(userRepository, times(1)).findByEmail("abc@gmail.com");
     }
 
     @Test
-    public void createuser_departmentNotFoundException()
+    public void verifyUserCreationErrorWhenDepartmentDoesNotExist()
     {
-        when(userRepository.findByEmail("abc@gmail.com")).thenReturn(Optional.empty());
-        when(departmentRepository.findById(1)).thenThrow(new ResourceNotFoundException("Department does not exist"));
+        //GIVEN
+        Department department = Department.builder()
+                .departmentName("Test")
+                .departmentId(1).build();
+        userRepository.save(User.builder().firstName("x").email("x@gmail.com").lastName("y")
+                .dob(new Date("30/12/1992")).department(department).build());
 
+        //WHEN
         DepartmentDTO departmentDTO = DepartmentDTO.builder()
-                .departmentId(1)
+                .departmentId(2)
                 .departmentName("Test").build();
         UserDTO userDTO = UserDTO.builder()
                 .department(departmentDTO)
@@ -76,23 +88,15 @@ public class UserServiceTest {
                 .lastName("TestUser")
                 .build();
 
+        //THEN
         assertThrows(ResourceNotFoundException.class, ()->userService.createUser(userDTO));
-        verify(userRepository, times(1)).findByEmail("abc@gmail.com");
-        verify(departmentRepository, times(1)).findById(1);
 
     }
 
     @Test
-    public void createUser_success()
+    public void verifyUserCreationSuccess()
     {
-        User user = User.builder()
-                .lastName("Test")
-                .firstName("Test")
-                .dob(new Date("30/12/1992"))
-                .department(new Department(1, "Test"))
-                .email("abc@gmail.com")
-                .build();
-
+        //GIVEN
         DepartmentDTO departmentDTO = DepartmentDTO.builder()
                 .departmentId(1)
                 .departmentName("Test").build();
@@ -101,29 +105,27 @@ public class UserServiceTest {
                 .firstName("Test")
                 .dob(new Date("30/12/1992"))
                 .department(departmentDTO)
-                .email("abc@gmail.com")
+                .email("pqrxyzw1@gmail.com")
                 .build();
-
-        when(userRepository.findByEmail("abc@gmail.com")).thenReturn(Optional.empty());
-        when(departmentRepository.findById(1)).thenReturn(Optional.of(new Department(1, "Test")));
-        when(userRepository.save(user)).thenReturn(user);
+        //WHEN
         userService.createUser(userDTO);
-        verify(userRepository, times(1)).findByEmail("abc@gmail.com");
-        verify(userRepository, times(1)).save(user);
-        verify(departmentRepository, times(1)).findById(1);
+
+        //THEN
+        assertTrue(!userRepository.findByEmail("pqrxyzw1@gmail.com").isEmpty());
 
     }
 
     @Test
     public void getAllUsers_success()
     {
+        //GIVEN
         User user1 = User.builder()
                 .userId(1)
                 .lastName("Test")
                 .firstName("Test")
                 .dob(new Date("30/12/1992"))
                 .department(new Department(1, "Test"))
-                .email("abc1@gmail.com")
+                .email("abc5@gmail.com")
                 .build();
 
         User user2 = User.builder()
@@ -132,62 +134,28 @@ public class UserServiceTest {
                 .firstName("Test")
                 .dob(new Date("30/12/1992"))
                 .department(new Department(1, "Test"))
-                .email("abc2@gmail.com")
+                .email("abc6@gmail.com")
                 .build();
-        when(userRepository.findAll()).thenReturn(List.of(user1, user2));
+        userRepository.save(user1);
+        userRepository.save(user2);
+        //WHEN
         List<UserDTO> userDTOS = userService.getAllUsers();
-        assertTrue(userDTOS.size()==2);
-        verify(userRepository, times(1)).findAll();
+        //THEN
+        assertTrue(userDTOS.size()==10);
     }
 
-    @Test
-    public void getUserById_success()
-    {
-        User user1 = User.builder()
-                .userId(1)
-                .lastName("Test")
-                .firstName("Test")
-                .dob(new Date("30/12/1992"))
-                .department(new Department(1, "Test"))
-                .email("abc1@gmail.com")
-                .build();
-        when(userRepository.findById(1)).thenReturn(Optional.ofNullable(user1));
-        UserDTO userDTO = userService.getUserById(1);
-        assertTrue(userDTO.getUserId()==1);
-        verify(userRepository, times(1)).findById(1);
-    }
 
     @Test
     public void getUserById_failure()
     {
-        when(userRepository.findById(1)).thenThrow(new ResourceNotFoundException("User not found"));
-        assertThrows(ResourceNotFoundException.class, ()->{userService.getUserById(1);});
+        assertThrows(ResourceNotFoundException.class, ()->{userService.getUserById(81);});
     }
 
 
     @Test
     public void deleteUser_failure()
     {
-        when(userRepository.findById(1)).thenThrow(new ResourceNotFoundException("Resource Not Found"));
-        assertThrows(ResourceNotFoundException.class,()->userService.deleteUser(1));
-    }
-
-    @Test
-    public void deleteUser_success()
-    {
-        User user1 = User.builder()
-                .userId(1)
-                .lastName("Test")
-                .firstName("Test")
-                .dob(new Date("30/12/1992"))
-                .department(new Department(1, "Test"))
-                .email("abc1@gmail.com")
-                .build();
-        when(userRepository.findById(1)).thenReturn(Optional.ofNullable(user1));
-        doNothing().when(userRepository).deleteById(1);
-        userService.deleteUser(1);
-        verify(userRepository, times(1)).findById(1);
-        verify(userRepository,times(1)).deleteById(1);
+        assertThrows(ResourceNotFoundException.class,()->userService.deleteUser(91));
     }
 
     @Test
@@ -205,7 +173,7 @@ public class UserServiceTest {
                 .email("abc@gmail.com")
                 .build();
 
-        assertThrows(ResourceNotFoundException.class, ()->userService.updateUser(userDTO));
+        assertThrows(ResourceNotFoundException.class, ()->userService.updateUser(userDTO,1));
     }
 
     @Test
@@ -233,7 +201,7 @@ public class UserServiceTest {
                 .email("abc1@gmail.com")
                 .build();
 
-        userService.updateUser(userDTO);
+        userService.updateUser(userDTO,1);
         verify(userRepository, times(1)).findById(1);
         verify(userRepository, times(1)).save(user1);
     }

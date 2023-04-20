@@ -9,13 +9,16 @@ import com.jas.repository.DepartmentRepository;
 import com.jas.service.DepartmentService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.*;
 import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-@Component
+@Service
+@CacheConfig(cacheNames = {"DepartmentCache"})
 @Slf4j
 public class DepartmentServiceImpl implements DepartmentService {
 
@@ -25,6 +28,7 @@ public class DepartmentServiceImpl implements DepartmentService {
     @Autowired
     private AutoDepartmentMapper departmentMapper;
 
+
     public DepartmentDTO createDepartment(DepartmentDTO department) {
         if(!departmentRepository.findById(department.getDepartmentId()).isEmpty())
             throw new DepartmentAlreadyExistsException("Department already exists");
@@ -32,6 +36,8 @@ public class DepartmentServiceImpl implements DepartmentService {
         return department;
     }
 
+
+    @Cacheable(cacheNames = "departments")
     public List<DepartmentDTO> getAllDepartments()
     {
         List<Department> departmentList = departmentRepository.findAll();
@@ -40,6 +46,7 @@ public class DepartmentServiceImpl implements DepartmentService {
                 .collect(Collectors.toList());
     }
 
+    @Cacheable(cacheNames = "department", key = "#id", unless = "#result.departmentId > 3")
     public DepartmentDTO getDepartmentById(Integer id)
     {
         if (departmentRepository.findById(id).isEmpty())
@@ -47,7 +54,11 @@ public class DepartmentServiceImpl implements DepartmentService {
         return departmentMapper.departmentEntityToDTO(departmentRepository.findById(id).get());
     }
 
-    public DepartmentDTO updateDepartment(DepartmentDTO departmentDTO) {
+    @Caching(evict = { @CacheEvict(cacheNames = "department", key = "#id"),
+            @CacheEvict(cacheNames = "departments", allEntries = true) })
+    public DepartmentDTO updateDepartment(DepartmentDTO departmentDTO, Integer id) {
+        if(id!=departmentDTO.getDepartmentId())
+            throw new IllegalArgumentException("Department Id in the path param and body do not mactch");
         Department department = departmentMapper.departmentDTOToEntity(departmentDTO);
         Optional<Department> departmentId = departmentRepository.findById(department.getDepartmentId());
         if(departmentId.isEmpty())
@@ -57,6 +68,8 @@ public class DepartmentServiceImpl implements DepartmentService {
            return departmentDTO;
     }
 
+    @Caching(evict = { @CacheEvict(cacheNames = "department", key = "#id"),
+            @CacheEvict(cacheNames = "departments", allEntries = true) })
     public void deleteDepartment(Integer id)
     {
         if (departmentRepository.findById(id).isEmpty())

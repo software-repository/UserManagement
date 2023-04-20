@@ -8,12 +8,15 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.hibernate.validator.constraints.Range;
+import org.springframework.data.redis.core.RedisHash;
+
+import java.io.Serializable;
 
 @AllArgsConstructor
 @NoArgsConstructor
 @Data
 @Builder
-public class DepartmentDTO {
+public class DepartmentDTO implements Serializable {
 
     @Range(min = 1, max=10, message = "Department Id must be between 1 and 10")
     @NotNull(message = "departmentId cannot be null")
