@@ -16,7 +16,7 @@ public class UserCacheScheduler {
         cacheManager.getCacheNames().stream()
                 .forEach(cacheName -> cacheManager.getCache(cacheName).clear());
     }
-    @Scheduled(cron = "0 2 * * *")
+    @Scheduled(cron = "0 0 2 * * *")
     public void evictAllcachesAtIntervals() {
         evictAllCaches();
     }
