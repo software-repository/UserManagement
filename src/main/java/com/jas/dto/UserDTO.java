@@ -21,6 +21,8 @@ import java.util.Optional;
 @Builder
 public class UserDTO implements Serializable {
 
+    private static final long SerialVersionUID=10l;
+
     private Integer userId;
 
     @Size.List({

@@ -11,10 +11,7 @@ import com.jas.repository.UserRepository;
 import com.jas.service.UserService;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.cache.annotation.CacheConfig;
-import org.springframework.cache.annotation.CacheEvict;
-import org.springframework.cache.annotation.Cacheable;
-import org.springframework.cache.annotation.Caching;
+import org.springframework.cache.annotation.*;
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 
@@ -42,6 +39,7 @@ public class UserServiceImpl implements UserService {
         if(departmentRepository.findById(user.getDepartment().getDepartmentId()).isEmpty())
             throw new ResourceNotFoundException("Department Id does not exist");
         userRepository.save(user);
+        userDTO.setUserId(userRepository.findByEmail(user.getEmail()).get().getUserId());
         return userDTO;
     }
 
@@ -53,7 +51,7 @@ public class UserServiceImpl implements UserService {
                 .collect(Collectors.toList());
     }
 
-    @Cacheable(cacheNames = "user", key = "#id", unless = "#result.userId > 3")
+    @Cacheable(cacheNames = "user", key = "#id", unless = "#result.getUserId() > 3")
     public UserDTO getUserById(Integer id) {
         Optional<User> user = userRepository.findById(id);
         if(user.isEmpty())
@@ -61,8 +59,10 @@ public class UserServiceImpl implements UserService {
         return autoUserMapper.userEntityToDTO(user.get());
     }
 
-    @Caching(evict = { @CacheEvict(cacheNames = "user", key = "#id"),
-            @CacheEvict(cacheNames = "users", allEntries = true) })
+    @Caching(
+            put =   { @CachePut(value = "user", key = "#id") },
+            evict = {@CacheEvict(cacheNames = "users", allEntries = true) }
+    )
     public void updateUser(UserDTO userDTO , Integer id) {
         if(id!=userDTO.getUserId())
             throw new IllegalArgumentException("Ids do not match");
@@ -73,7 +73,7 @@ public class UserServiceImpl implements UserService {
     }
 
 
-  @Caching(evict = { @CacheEvict(cacheNames = "user", key = "#id"),
+ @Caching(evict = { @CacheEvict(cacheNames = "user", key = "#id"),
             @CacheEvict(cacheNames = "users", allEntries = true) })
     public void deleteUser(Integer id) {
         if(userRepository.findById(id).isEmpty())

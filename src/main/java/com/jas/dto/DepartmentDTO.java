@@ -18,6 +18,8 @@ import java.io.Serializable;
 @Builder
 public class DepartmentDTO implements Serializable {
 
+    private static final long SerialVersionUID=42l;
+
     @Range(min = 1, max=10, message = "Department Id must be between 1 and 10")
     @NotNull(message = "departmentId cannot be null")
     private Integer departmentId;

@@ -37,7 +37,7 @@ public class DepartmentServiceImpl implements DepartmentService {
     }
 
 
-    @Cacheable(cacheNames = "departments")
+   @Cacheable(cacheNames = "departments")
     public List<DepartmentDTO> getAllDepartments()
     {
         List<Department> departmentList = departmentRepository.findAll();
@@ -46,7 +46,6 @@ public class DepartmentServiceImpl implements DepartmentService {
                 .collect(Collectors.toList());
     }
 
-    @Cacheable(cacheNames = "department", key = "#id", unless = "#result.departmentId > 3")
     public DepartmentDTO getDepartmentById(Integer id)
     {
         if (departmentRepository.findById(id).isEmpty())
@@ -54,8 +53,10 @@ public class DepartmentServiceImpl implements DepartmentService {
         return departmentMapper.departmentEntityToDTO(departmentRepository.findById(id).get());
     }
 
-    @Caching(evict = { @CacheEvict(cacheNames = "department", key = "#id"),
-            @CacheEvict(cacheNames = "departments", allEntries = true) })
+   @Caching(
+            evict = {@CacheEvict(value = "departments", allEntries = true)},
+            put   = {@CachePut(value = "department", key = "#id")}
+    )
     public DepartmentDTO updateDepartment(DepartmentDTO departmentDTO, Integer id) {
         if(id!=departmentDTO.getDepartmentId())
             throw new IllegalArgumentException("Department Id in the path param and body do not mactch");
